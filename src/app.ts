@@ -6,11 +6,13 @@ export const app = express();
 
 app.use(express.json());
 
-app.get("/me", (req, res) => {
+app.get("/", (req, res) => {
+  res.send("Backend is running");
   const auth = req.headers.authorization;
   if (!auth) return res.sendStatus(401);
 
   const token = auth.split(" ")[1];
+  if (!token) return res.sendStatus(401);
   const payload = verifyToken(token);
 
   res.json({ userId: payload.userId });
