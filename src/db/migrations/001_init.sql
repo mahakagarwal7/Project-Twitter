@@ -47,7 +47,7 @@ CREATE TABLE blocks (
 
 CREATE TABLE sessions (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
+  user_id INTEGER REFERENCES users_identity(user_id),
   token TEXT NOT NULL,
   expires_at TIMESTAMP NOT NULL
 );
