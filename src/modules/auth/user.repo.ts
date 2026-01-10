@@ -48,6 +48,20 @@ export async function findUserByEmail(email: string) {
   return user;
 }
 
+export async function findUserById(userId: number) {
+  const result = await pg.query(
+    `
+    SELECT *
+    FROM users_identity
+    WHERE id = $1
+    `,
+    [userId]
+  );
+
+  return result.rows[0];
+}
+
+
 export async function incrementFailedAttempts(userId: number) {
   await pg.query(
     `
@@ -81,4 +95,21 @@ export async function lockAccount(userId: number, minutes: number) {
     [userId]
   );
 }
+
+export async function updatePasswordHash(
+  userId: number,
+  newPasswordHash: string
+) {
+  await pg.query(
+    `
+    UPDATE users_identity
+    SET password_hash = $1
+    WHERE id = $2
+    `,
+    [newPasswordHash, userId]
+  );
+}
+
+
+
 
