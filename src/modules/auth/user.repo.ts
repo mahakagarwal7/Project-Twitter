@@ -53,7 +53,7 @@ export async function findUserById(userId: number) {
     `
     SELECT *
     FROM users_identity
-    WHERE id = $1
+    WHERE user_id = $1
     `,
     [userId]
   );
@@ -67,7 +67,7 @@ export async function incrementFailedAttempts(userId: number) {
     `
     UPDATE users_identity
     SET failed_login_attempts = failed_login_attempts + 1
-    WHERE id = $1
+    WHERE user_id = $1
     `,
     [userId]
   );
@@ -79,7 +79,7 @@ export async function resetFailedAttempts(userId: number) {
     UPDATE users_identity
     SET failed_login_attempts = 0,
         locked_until = NULL
-    WHERE id = $1
+    WHERE user_id = $1
     `,
     [userId]
   );
@@ -90,7 +90,7 @@ export async function lockAccount(userId: number, minutes: number) {
     `
     UPDATE users_identity
     SET locked_until = NOW() + INTERVAL '${minutes} minutes'
-    WHERE id = $1
+    WHERE user_id = $1
     `,
     [userId]
   );

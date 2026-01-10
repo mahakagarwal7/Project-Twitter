@@ -3,6 +3,9 @@ import type { Request, Response } from "express";
 import { deleteSession } from "../sessions/session.repo";
 import { changePassword } from "./password-change.service";
 import { PasswordPolicyError } from "./password.policy";
+import { blacklistToken } from "./tokenBlacklist";
+import { verifyToken } from "../../crypto/jwt";
+
 
 export async function signupHandler(req:Request, res: Response) {
   try {
@@ -24,22 +27,26 @@ export async function loginHandler(req: Request, res: Response) {
 }
 
 
-export async function logoutHandler(req: Request, res: Response) 
- {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.sendStatus(401);
+export async function logoutHandler(req: Request, res: Response) {
+  const auth = req.headers.authorization;
+  if (!auth) return res.sendStatus(401);
 
+  const token = auth.split(" ")[1];
+  if (!token) return res.sendStatus(401);
+  const payload = verifyToken(token);
+  await blacklistToken(token, payload.exp);
   await deleteSession(token);
   res.send("Logged out");
 }
-
 export async function changePasswordHandler(req: Request, res: Response) {
   try {
-    const userId = req.user.userId; // from auth middleware //for this line we have added express.d.ts file under types folder
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+
+    const userId = req.user.userId; 
     const { oldPassword, newPassword } = req.body;
-
     await changePassword(userId, oldPassword, newPassword);
-
     res.send("Password updated successfully");
   } catch (err) {
     if (err instanceof PasswordPolicyError) {
