@@ -2,9 +2,16 @@ import { hashPassword, verifyPassword } from "../../crypto/password";
 import { createToken } from "../../crypto/jwt";
 import { createUser, findUserByEmail } from "./user.repo";
 import { createSession } from "../sessions/session.repo";
+import { validatePassword } from "./password.policy";
 
 export async function signup(email: string, password: string) {
+
+  validatePassword(password);
+
+ 
   const passwordHash = await hashPassword(password);
+
+ 
   await createUser(email, passwordHash);
 }
 export async function login(email: string, password: string) {
