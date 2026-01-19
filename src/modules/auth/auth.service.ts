@@ -11,10 +11,6 @@ import { validatePassword } from "./password.policy";
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_TIME_MINUTES = 15;
 
-/**
- * SIGNUP FLOW
- * Goal: make signup predictable and safe
- */
 export async function signup(email: string, password: string) {
   validatePassword(password);
 
@@ -22,18 +18,14 @@ export async function signup(email: string, password: string) {
 
   await createUser(email, passwordHash);
 
-  // Signup does not auto-login (clean separation of concerns)
+
   return { success: true };
 }
 
-/**
- * LOGIN FLOW
- * Goal: stabilize login + add security (failed attempts & lock)
- */
+
 export async function login(email: string, password: string) {
   const user = await findUserByEmail(email);
 
-  // 🔹 CHANGE: Clear error for invalid credentials
   if (!user) {
     throw new Error("Invalid credentials");
   }
@@ -54,7 +46,6 @@ export async function login(email: string, password: string) {
     throw new Error("Invalid credentials");
   }
 
-  // 🔹 CHANGE: Reset failed attempts on successful login
   await resetFailedAttempts(user.id);
 
   const token = createToken(user.id);
